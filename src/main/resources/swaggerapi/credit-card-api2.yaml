@@ -1,0 +1,186 @@
+---
+openapi: 3.0.0
+info:
+  title: Simple Credit Card Processing API
+  description: This is a API for a credit card provider. It should allow you to add new credit card accounts and view them as a list.
+  contact:
+    email: you@your-company.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+servers:
+- url: https://virtserver.swaggerhub.com/adammahmood/CredtCardAPI/1.0.1
+  description: SwaggerHub API Auto Mocking
+- url: https://localhost/CredtCardAPI/1.0.1
+  description: SwaggerHub API Auto Mocking
+tags:
+- name: admins
+  description: Secured Admin-only calls
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /creditcards:
+    get:
+      tags:
+      - admins
+      summary: gets a all customer's credit cards
+      description: "Retrieves all the credit cards \n"
+      operationId: getCreditCards
+      parameters:
+      - name: skip
+        in: query
+        description: number of records to skip for pagination
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+      - name: limit
+        in: query
+        description: maximum number of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 0
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreditCard'
+        "400":
+          description: bad input parameter
+  /{branchId}/{customerId}/creditcards:
+    post:
+      tags:
+      - admins
+      summary: adds a credit card
+      description: Adds a valid credit card to the bank system for a certain customer identified
+      operationId: addCreditCard
+      parameters:
+      - name: branchId
+        in: path
+        description: branch id of bank
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: customerId
+        in: path
+        description: customer id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+      requestBody:
+        description: Credit card to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditCard'
+        required: true
+      responses:
+        "201":
+          description: credit card created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditCardResponse'
+        "400":
+          description: invalid input, object invalid
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+components:
+  schemas:
+    CreditCard:
+      required:
+      - cardNetwork
+      - creditCardNumber
+      - creditLimit
+      - cvd
+      - expiryMonth
+      - expiryYear
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe+
+        creditCardNumber:
+          type: string
+          description: Credit card number. digits(20)
+          example: "5100000010001004"
+        creditLimit:
+          type: string
+          description: Maximum Credit card limit.
+          default: "2500"
+        cvd:
+          type: string
+          description: Security code on the back of the credit card. This can be set to mandatory in the back office. digits(3 or 4)
+          example: "123"
+        expiryMonth:
+          type: string
+          description: eg. 02 for February. digits(2)
+          example: "02"
+        expiryYear:
+          type: string
+          description: eg. 15 for 2015. digits(2)
+          example: "18"
+        cardNetwork:
+          $ref: '#/components/schemas/CardNetwork'
+    CardNetwork:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: VISA
+    ErrorDetials:
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/JSONAPIErrorDetails'
+      description: a set of error codes and detatails recieved when trying to to complete the request
+    JSONAPIErrorDetails:
+      properties:
+        code:
+          type: integer
+          format: int32
+        details:
+          type: string
+        message:
+          type: string
+        reference:
+          type: string
+      description: Error detals object
+    CreditCardResponse:
+      properties:
+        code:
+          type: number
+          format: integer
+        customerId:
+          type: string
+          description: the customer ID.
+        message:
+          type: string
