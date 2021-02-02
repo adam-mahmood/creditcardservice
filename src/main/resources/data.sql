@@ -1,0 +1,1 @@
+insert into Card_Networks (name) values('VISA');
