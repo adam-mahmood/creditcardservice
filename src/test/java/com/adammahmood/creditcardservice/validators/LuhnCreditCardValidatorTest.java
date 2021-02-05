@@ -1,5 +1,6 @@
 package com.adammahmood.creditcardservice.validators;
 
+import com.adammahmood.creditcardservice.exceptions.InvalidCreditCardException;
 import com.adammahmood.creditcardservice.model.CreditCard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,28 +21,29 @@ class LuhnCreditCardValidatorTest {
     @ParameterizedTest(name = "creditCardNumber:{0} = isValid:{1}")
     @CsvSource({
                 "49927398716,true",
-                "49927398717,false",
-                "1234567812345678,false",
                 "1234567812345670,true",
+            "79927398713,true"
     })
-    void validate(String creditCardNumber,boolean isValid) {
+    void validateValidNumbers(String creditCardNumber,boolean isValid) {
         CreditCard card = new CreditCard();
         card.setCreditCardNumber(creditCardNumber);
-        validator.validate(card);
+        assertEquals(isValid,validator.validate(card));
     }
 
-
-    @DisplayName("Should calculate the correct sum")
-    @ParameterizedTest(name = "{index} => a={0}, b={1}, sum={2}")
+    @ParameterizedTest(name = "creditCardNumber:{0} = isValid:{1}")
     @CsvSource({
-            "1, 1, 2",
-            "2, 3, 5"
+            "49927398717,false",
+            "1234567812345678,false",
+            "79927398710,false",
+            "79927398711,false",
+            "79927398712,false",
     })
-    void sum(int a, int b, int sum) {
-        assertEquals(sum, a + b);
+    void validateInvalidNumbers(String creditCardNumber,boolean isValid) {
+        CreditCard card = new CreditCard();
+        card.setCreditCardNumber(creditCardNumber);
+        assertThrows(InvalidCreditCardException.class,() -> {
+            validator.validate(card);
+        });
     }
-
-
-
 
 }

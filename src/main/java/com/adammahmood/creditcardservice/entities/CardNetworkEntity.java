@@ -13,8 +13,9 @@ public class CardNetworkEntity {
     @Column(name = "id")
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "cardNetwork")
-    private CreditCardEntity creditCard;
+//    @OneToOne(mappedBy = "cardNetwork")
+//    private CreditCardEntity creditCard;
 }

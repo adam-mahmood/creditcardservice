@@ -5,6 +5,7 @@ import com.adammahmood.creditcardservice.entities.CreditCardEntity;
 import com.adammahmood.creditcardservice.exceptions.RecordNotFoundException;
 import com.adammahmood.creditcardservice.model.CardNetwork;
 import com.adammahmood.creditcardservice.model.CreditCard;
+import com.adammahmood.creditcardservice.repositories.CardNetworkRepository;
 import com.adammahmood.creditcardservice.repositories.CreditCardRepository;
 import com.adammahmood.creditcardservice.validators.CreditCardValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,13 @@ public class CreditCardService {
 
     private  final CreditCardRepository creditCardRepository;
 
+    private  final CardNetworkRepository cardNetworkRepository;
+
     @Autowired
-    public CreditCardService(List<CreditCardValidator> creditCardValidators, CreditCardRepository creditCardRepository) {
+    public CreditCardService(List<CreditCardValidator> creditCardValidators, CreditCardRepository creditCardRepository, CardNetworkRepository cardNetworkRepository) {
         this.creditCardValidators = creditCardValidators;
         this.creditCardRepository = creditCardRepository;
+        this.cardNetworkRepository = cardNetworkRepository;
     }
 
     public CreditCardEntity validateAndAddCreditCard(CreditCard creditCard) {
@@ -44,28 +48,35 @@ public class CreditCardService {
 
         CreditCardEntity newEntity;
 
-        if(cardEntity.isPresent())
+        if(cardEntity.isEmpty())
         {
-            newEntity = cardEntity.get();
-            newEntity.setCreditLimit(creditCard.getCreditLimit());
-            newEntity.setCvd(creditCard.getCvd());
-            newEntity.setCreationDate(LocalDateTime.now());
-            newEntity.setExpiryMonth(creditCard.getExpiryMonth());
-            newEntity.setExpiryYear(creditCard.getExpiryYear());
-            newEntity.setCardNetwork(toCardNetworkEntity(creditCard.getCardNetwork()));
-            newEntity.setBalance(newEntity.getBalance());
-            newEntity = creditCardRepository.save(newEntity);
-
-            return newEntity;
-        } else {
             newEntity = toCreditCardEntity(creditCard);
             newEntity = creditCardRepository.save(newEntity);
             return newEntity;
+
+        } else {
+            log.info("Credit card {} already exists",creditCard.getCreditCardNumber());
+            return updateCreditCard(creditCard, cardEntity.get());
         }
+    }
+
+    private CreditCardEntity updateCreditCard(CreditCard creditCard, CreditCardEntity newEntity) {
+        newEntity.setCreditLimit(creditCard.getCreditLimit());
+        newEntity.setCvd(creditCard.getCvd());
+        newEntity.setCreationDate(LocalDateTime.now());
+        newEntity.setExpiryMonth(creditCard.getExpiryMonth());
+        newEntity.setExpiryYear(creditCard.getExpiryYear());
+        newEntity.setCardNetwork(toCardNetworkEntity(creditCard.getCardNetwork()));
+        newEntity.setBalance(newEntity.getBalance());
+        newEntity = creditCardRepository.save(newEntity);
+
+        return newEntity;
     }
 
     private CreditCardEntity toCreditCardEntity(CreditCard creditCard) {
         CreditCardEntity newEntity = new CreditCardEntity();
+        newEntity.setName(creditCard.getName());
+        newEntity.setCreditCardNumber(creditCard.getCreditCardNumber());
         newEntity.setCreditLimit(creditCard.getCreditLimit());
         newEntity.setCvd(creditCard.getCvd());
         newEntity.setCreationDate(LocalDateTime.now());
@@ -77,9 +88,16 @@ public class CreditCardService {
     }
 
     private CardNetworkEntity toCardNetworkEntity(CardNetwork cardNetwork) {
-        CardNetworkEntity cardNetworkEntity = new CardNetworkEntity();
-        cardNetworkEntity.setName(cardNetwork.getName());
-        return cardNetworkEntity;
+        Optional<CardNetworkEntity> optionalCreditCardEntity = Optional.ofNullable(cardNetworkRepository
+                .findByNetwork(cardNetwork.getName()));
+        if (optionalCreditCardEntity.isEmpty()){
+            CardNetworkEntity cardNetworkEntity = new CardNetworkEntity();
+            cardNetworkEntity.setName(cardNetwork.getName());
+            //cardNetworkRepository.save(cardNetworkEntity);
+            return cardNetworkEntity;
+        }
+
+        return optionalCreditCardEntity.get();
     }
 
     public List<CreditCardEntity> getAllCreditCards()
@@ -89,7 +107,7 @@ public class CreditCardService {
         if(creditCardEntities.size() > 0) {
             return creditCardEntities;
         } else {
-            return new ArrayList<CreditCardEntity>();
+            return new ArrayList<>();
         }
     }
 }

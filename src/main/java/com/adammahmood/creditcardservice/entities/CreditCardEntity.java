@@ -36,7 +36,7 @@ public class CreditCardEntity {
     @Column(name = "creationDate", columnDefinition = "TIMESTAMP")
     private LocalDateTime creationDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "card__network_id", referencedColumnName = "id")
     private CardNetworkEntity cardNetwork;
 
