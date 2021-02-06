@@ -12,8 +12,10 @@ info:
 servers:
 - url: https://virtserver.swaggerhub.com/adammahmood/CredtCardAPI/1.0.0
   description: SwaggerHub API Auto Mocking
+- url: http://localhost/CredtCardAPI/1.0.0
 - url: https://localhost/CredtCardAPI/1.0.0
-  description: SwaggerHub API Auto Mocking
+security:
+- basicAuth: []
 tags:
 - name: admins
   description: Secured Admin-only calls
@@ -168,3 +170,7 @@ components:
           description: the customer ID.
         message:
           type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
