@@ -31,7 +31,7 @@ pipeline {
 
             post {
                 success {
-                    junit './creditcardserviceserver/**/target/surefire-reports/TEST-*.xml'
+                    junit './creditcardserviceserver/target/surefire-reports/TEST-*.xml'
                     archiveArtifacts './creditcardserviceserver/target/*.jar'
                 }
 
