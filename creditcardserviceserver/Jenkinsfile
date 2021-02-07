@@ -8,6 +8,7 @@ pipeline {
     stages {
             stage('Checkout') {
                 steps {
+                    // Checkout out branch main
                     git url: 'https://github.com/adam-mahmood/creditcardservice.git', branch: 'main'
                     echo "$GIT_BRANCH"
                 }
@@ -25,8 +26,6 @@ pipeline {
             }
 
             post {
-                // If Maven was able to run the tests, even if some of the test
-                // failed, record the test results and archive the jar file.
                 success {
                     junit '**/target/surefire-reports/TEST-*.xml'
                     archiveArtifacts 'target/*.jar'
@@ -37,7 +36,7 @@ pipeline {
                     body: "Please go to ${BUILD_URL} and verify the build",
                     attachLog: true,
                     compressLog: true,
-                    to: "test@jenkins",
+                    to: "adds0072004@hotmail.com",
                     recipientProviders: [upstreamDevelopers(), requestor()]
                 }
             }
