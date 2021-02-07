@@ -2,6 +2,14 @@ version: "3.8"
 
 # I like docker-compose because I can easily spin up multiple apps like a test email server alongside jenkins! for testing email notifications from jenkins (later)
 services:
+  creditcardserviceserver:
+    build:
+      context: ./creditcardserviceserver
+      dockerfile: Dockerfile
+    container_name: creditcardservice-server
+    ports:
+      - "127.0.0.1:8080:8080"
+
 
   jenkins:
     image: jenkins/jenkins:2.271-jdk11
