@@ -11,7 +11,10 @@ import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE+1)
+/**
+ * This validator applies the luhn 10 algorithm to validate a credit card number
+ */
 public class LuhnCreditCardValidator implements CreditCardValidator {
 
     @Override
