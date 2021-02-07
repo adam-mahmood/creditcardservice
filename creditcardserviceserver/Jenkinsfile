@@ -18,10 +18,12 @@ pipeline {
                 // Get some code from a GitHub repository
                 // git 'https://github.com/adam-mahmood/creditcardservice.git'
 
-                sh 'cd creditcardserviceserver'
-
                 // Run Maven on a Unix agent.
-                sh './mvnw clean package'
+                sh '''
+                    
+                    cd creditcardserviceserver
+                    ./mvnw clean package
+                 '''
 
                 // To run Maven on a Windows agent, use
                 // bat "./mvnw clean package"
