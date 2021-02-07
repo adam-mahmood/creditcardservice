@@ -1,58 +1,52 @@
----
 openapi: 3.0.0
+servers:
+
+  -  url: http://localhost/CredtCardAPI/1.0.0
+  -  url: https://localhost/CredtCardAPI/1.0.0
+
 info:
-  title: Simple Credit Card Processing API
   description: This is a API for a credit card provider. It should allow you to add new credit card accounts and view them as a list.
+  version: "1.0.3"
+  title: Simple Credit Card Processing API
   contact:
     email: you@your-company.com
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
-servers:
-- url: https://virtserver.swaggerhub.com/adammahmood/CredtCardAPI/1.0.0
-  description: SwaggerHub API Auto Mocking
-- url: http://localhost/CredtCardAPI/1.0.0
-- url: https://localhost/CredtCardAPI/1.0.0
-security:
-- basicAuth: []
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
-- name: admins
-  description: Secured Admin-only calls
-- name: developers
-  description: Operations available to regular developers
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
 paths:
   /creditcards:
     get:
       tags:
-      - admins
+        - admins
       summary: gets a all customer's credit cards
-      description: "Retrieves all the credit cards \n"
+      security:
+        - oAuthSample: [admin]   # Use OAuth with a different scope
       operationId: getCreditCards
+      description: |
+        Retrieves all the credit cards 
       parameters:
-      - name: skip
-        in: query
-        description: number of records to skip for pagination
-        required: false
-        style: form
-        explode: true
-        schema:
-          minimum: 0
-          type: integer
-          format: int32
-      - name: limit
-        in: query
-        description: maximum number of records to return
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 50
-          minimum: 0
-          type: integer
-          format: int32
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
       responses:
-        "200":
+        '200':
           description: search results matching criteria
           content:
             application/json:
@@ -60,49 +54,106 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CreditCard'
-        "400":
+        '400':
           description: bad input parameter
-    post:
-      tags:
-      - admins
-      summary: adds a credit card
-      description: Adds a valid credit card to the bank system for a certain customer identified
-      operationId: addCreditCard
-      requestBody:
-        description: Credit card to add
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreditCard'
-        required: true
-      responses:
-        "201":
-          description: credit card created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreditCardResponse'
-        "400":
-          description: invalid input, object invalid
+        '401':
+          description: Not authenticated
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ErrorDetials'
+        '403':
+          description: Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+    post:
+      tags:
+        - admins
+      summary: adds a credit card
+      security:
+        - oAuthSample: [write]   # Use OAuth with a different scope
+      operationId: addCreditCard
+      description: Adds a valid credit card to the bank system for a certain customer identified
+      responses:
+        '201':
+          description: credit card created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditCardResponse'
+        '400':
+          description: 'invalid input, object invalid'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+        '403':
+          description: Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditCard'
+        description: Credit card to add
+        required: true
+
+
+#apply security globally...
+security:
+  - basicAuth: []
+
+
 components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+    oAuthSample:    # <---- arbitrary name
+      type: oauth2
+      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+      flows:
+        authorizationCode:
+          authorizationUrl: https://localhost:8083/oauth/authorize
+          tokenUrl: localhost:8083/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
   schemas:
     CreditCard:
-      required:
-      - cardNetwork
-      - creditCardNumber
-      - creditLimit
-      - cvd
-      - expiryMonth
-      - expiryYear
-      - id
-      - name
       type: object
+      required:
+        - id
+        - name
+        - creditCardNumber
+        - creditLimit
+        - cvd
+        - expiryMonth
+        - expiryYear
+        - cardNetwork
       properties:
         id:
           type: string
@@ -112,65 +163,61 @@ components:
           type: string
           example: John Doe
         creditCardNumber:
-          type: string
-          description: Credit card number. digits(20)
           example: "5100000010001004"
+          description: Credit card number. digits(20)
+          type: string
         creditLimit:
-          type: string
-          description: Maximum Credit card limit.
           default: "2500"
+          description: Maximum Credit card limit.
+          type: string
         cvd:
-          type: string
-          description: Security code on the back of the credit card. This can be set to mandatory in the back office. digits(3 or 4)
           example: "123"
+          description: Security code on the back of the credit card. This can be set to mandatory in the back office. digits(3 or 4)
+          type: string
         expiryMonth:
-          type: string
-          description: eg. 02 for February. digits(2)
           example: "02"
-        expiryYear:
+          description: eg. 02 for February. digits(2)
           type: string
-          description: eg. 15 for 2015. digits(2)
+        expiryYear:
           example: "18"
+          description: eg. 15 for 2015. digits(2)
+          type: string
         cardNetwork:
           $ref: '#/components/schemas/CardNetwork'
     CardNetwork:
       required:
-      - name
-      type: object
+        - name
       properties:
         name:
           type: string
           example: VISA
+      type: object
     ErrorDetials:
+      description: a set of error codes and detatails recieved when trying to to complete the request
       properties:
         errors:
           type: array
           items:
             $ref: '#/components/schemas/JSONAPIErrorDetails'
-      description: a set of error codes and detatails recieved when trying to to complete the request
     JSONAPIErrorDetails:
+      description: Error detals object
       properties:
         code:
-          type: integer
           format: int32
+          type: integer
         details:
           type: string
         message:
           type: string
         reference:
           type: string
-      description: Error detals object
     CreditCardResponse:
       properties:
         code:
-          type: number
           format: integer
+          type: number
         customerId:
-          type: string
           description: the customer ID.
+          type: string
         message:
           type: string
-  securitySchemes:
-    basicAuth:
-      type: http
-      scheme: basic

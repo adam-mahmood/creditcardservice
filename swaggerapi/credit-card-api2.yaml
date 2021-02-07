@@ -25,6 +25,8 @@ paths:
       tags:
       - admins
       summary: gets a all customer's credit cards
+      security:
+        - oAuthSample: [admin]   # Use OAuth with a different scope
       description: "Retrieves all the credit cards \n"
       operationId: getCreditCards
       parameters:
@@ -60,11 +62,29 @@ paths:
                   $ref: '#/components/schemas/CreditCard'
         "400":
           description: bad input parameter
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+        '403':
+          description: Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
   /{branchId}/{customerId}/creditcards:
     post:
       tags:
       - admins
       summary: adds a credit card
+      security:
+        - oAuthSample: [write]   # Use OAuth with a different scope
       description: Adds a valid credit card to the bank system for a certain customer identified
       operationId: addCreditCard
       parameters:
@@ -109,7 +129,43 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ErrorDetials'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+        '403':
+          description: Access token does not have the required scope
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorDetials'
+#apply security globally...
+security:
+  - basicAuth: []
+
 components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+    oAuthSample:    # <---- arbitrary name
+      type: oauth2
+      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+      flows:
+        authorizationCode:
+          authorizationUrl: https://localhost:8083/oauth/authorize
+          tokenUrl: localhost:8083/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
   schemas:
     CreditCard:
       required:
