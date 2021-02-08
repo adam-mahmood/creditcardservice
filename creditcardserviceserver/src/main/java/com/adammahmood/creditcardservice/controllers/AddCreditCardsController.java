@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,9 +34,7 @@ public class AddCreditCardsController implements BranchIdApi {
         log.info("Credit Card {} created",card);
         response.customerId(customerId.toString());
         response.setMessage(String.format("Credit Card %s created", card));
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(response.getCustomerId()).toUri();
-        //return ResponseEntity.created(location).build();
+
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

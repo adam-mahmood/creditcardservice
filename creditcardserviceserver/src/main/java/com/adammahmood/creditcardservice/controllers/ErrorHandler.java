@@ -15,17 +15,24 @@ public class ErrorHandler {
 
     @ExceptionHandler(value = {InvalidCreditCardException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorDetials handleRequest(final  Exception e){
+    public ErrorDetials handleBadRequest(final  Exception e){
+
+        return getErrorDetails(HttpStatus.BAD_REQUEST,e.getMessage());
+    }
+
+    @ExceptionHandler(value = {RuntimeException.class})
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorDetials handleInternalServerError(final  Exception e){
 
         return getErrorDetails(HttpStatus.BAD_REQUEST,e.getMessage());
     }
 
     private ErrorDetials getErrorDetails(final HttpStatus status, final String details){
         ErrorDetials errorDetials = new ErrorDetials();
-        JSONAPIErrorDetails jsonapiErrorDetails = new JSONAPIErrorDetails();
-        jsonapiErrorDetails.setCode(status.value());
-        jsonapiErrorDetails.details(details);
-
+        JSONAPIErrorDetails jsonapiErrorDetails = new JSONAPIErrorDetails()
+        .code(status.value())
+        .details(details)
+        .message(details);
         errorDetials.addErrorsItem(jsonapiErrorDetails);
         return errorDetials;
     }
