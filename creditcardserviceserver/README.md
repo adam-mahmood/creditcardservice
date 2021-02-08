@@ -42,46 +42,8 @@ cd creditcardservice
 
 2. - Run Docker and Map the port 8080 to port 8080. <br/>
 ``` docker run -p 8080:8080 spring_boot_credit_service ```
-3. curl command to add a credi carder <br/>
-``` curl -X POST \
-      http://localhost:8080/1/d290f1ee-6c54-4b01-90e6-d701748f0851/creditcards \
-      -H 'Content-Type: application/json' \
-      -H 'Postman-Token: a1495484-d0c4-4483-9719-adf9b8190bba' \
-      -H 'cache-control: no-cache' \
-      -d '    {
-            "name": "JOHN DIGGLES",
-            "creditCardNumber": "1234567812345670",
-            "creditLimit": "2500",
-            "cvd": "123",
-            "expiryMonth": "08",
-            "expiryYear": "22",
-            "cardNetwork": {
-                "name": "VISA"
-            }
-        }'
 
-```
-4. curl command to view a credi carder <br/>
-``` curl -X GET \
-  http://localhost:8080/creditcards \
-  -H 'Authorization: Basic cGx1cmFsc2lnaHQ6cGx1cmFsc2lnaHQ=' \
-  -H 'Content-Type: application/json' \
-  -H 'Postman-Token: ce783264-3e45-4bef-aa9b-f44ded6b84f4' \
-  -H 'cache-control: no-cache' \
-  -d '    {
-        "name": "JOHN DOE",
-        "creditCardNumber": "1234567812345670",
-        "creditLimit": "2500",
-        "cvd": "123",
-        "expiryMonth": "08",
-        "expiryYear": "22",
-        "cardNetwork": {
-            "name": "VISA"
-        }
-    }'
-
-```
-## Starting the Jenkins + Mail Server Container using Docker Compose
+## Starting the Jenkins + Mail Server Container + CreditcardServer using Docker Compose
 1. Start the containers
 ``` docker-compose up -d```
 
@@ -102,10 +64,46 @@ cd creditcardservice
          which can be copied and entered into the 'Secret' section in the previous step. 
         - Set an ID and click Add. You should ne navigated to Github Server section.
         - Under Name, click the drop down box and Select the ID set in the previous step.
-        - Click Test to test the connectivity
-    
+        - Click Test to test the connectivity 
+## Confirming   `CreditCardServicerServer`  is Up:
+1. curl command to add a credit card <br/>
+        `curl -X POST \
+      http://localhost:8080/1/d290f1ee-6c54-4b01-90e6-d701748f0851/creditcards \
+      -H 'Authorization: Basic cGx1cmFsc2lnaHQ6cGx1cmFsc2lnaHQ=' \
+      -H 'Content-Type: application/json' \
+      -H 'Postman-Token: 3044ebd2-553e-486c-b527-c9356355a174' \
+      -H 'cache-control: no-cache' \
+      -d '    {
+      "name": "JOHN DIGGLES",
+      "creditCardNumber": "1234567812345672",
+      "creditLimit": "2500",
+      "cvd": "123",
+      "expiryMonth": "08",
+      "expiryYear": "22",
+      "cardNetwork": {
+      "name": "VISA"
+      }
+      }'`
+ 2. curl command to view a credit card <br/>
+    `curl -X GET \
+      http://localhost:8080/creditcards \
+      -H 'Authorization: Basic cGx1cmFsc2lnaHQ6cGx1cmFsc2lnaHQ=' \
+      -H 'Content-Type: application/json' \
+      -H 'Postman-Token: ce783264-3e45-4bef-aa9b-f44ded6b84f4' \
+      -H 'cache-control: no-cache' \
+      -d '    {
+      "name": "JOHN DOE",
+      "creditCardNumber": "1234567812345670",
+      "creditLimit": "2500",
+      "cvd": "123",
+      "expiryMonth": "08",
+      "expiryYear": "22",
+      "cardNetwork": {
+      "name": "VISA"
+      }
+      }'
+      `
 ## Resources
-
 - [Maven](https://maven.apache.org/)
   - [Build Lifecycle](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)
   - [pom.xml](https://maven.apache.org/guides/introduction/introduction-to-the-pom.html)
