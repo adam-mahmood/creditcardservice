@@ -44,8 +44,15 @@ class BasicCreditCardValidatorTest {
         });
     }
 
-    @Test
-    void invalidCreditCardNumberLengthOf20Test() {
+    @ParameterizedTest(name = "creditCardNumber:{0}")
+    @CsvSource({
+            "123456789012345567888",
+            "123456789012345567888",
+            "5555555",
+            "398282246310005",
+            "3530"
+    })
+    void invalidCreditCardNumberLengthOf20Test(String creditCardNumber) {
         CreditCard card = new CreditCard();
         card.setCreditCardNumber("123456789012345567888");
         assertThrows(InvalidCreditCardException.class,() -> {
@@ -53,11 +60,18 @@ class BasicCreditCardValidatorTest {
         });
     }
 
+    /**
+     * see https://www.paypalobjects.com/en_GB/vhelp/paypalmanager_help/credit_card_numbers.htm for test numbers
+     * @param creditCardNumber
+     * @param isValid
+     */
     @ParameterizedTest(name = "creditCardNumber:{0} = isValid:{1}")
     @CsvSource({
-            "49927398716,true",
-            "1234567812345670,true",
-            "79927398713,true"
+            "4242424242424242,true",
+            "4000056655665556,true",
+            "5555555555554444,true",
+            "378282246310005,true",
+            "3530111333300000, true"
     })
     void validateValidNumbers(String creditCardNumber,boolean isValid) {
         CreditCard card = new CreditCard();

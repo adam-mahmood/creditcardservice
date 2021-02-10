@@ -19,7 +19,7 @@ public class LuhnCreditCardValidator implements CreditCardValidator {
 
     @Override
     public boolean validate(CreditCard card){
-        @NotNull String creditCardNumber = card.getCreditCardNumber();
+        @NotNull String creditCardNumber = card.getCreditCardNumber().replaceAll("-", "");
         log.info("Performing Luhn 10 algorithm on {}",creditCardNumber);
         int nDigits = creditCardNumber.length();
 
