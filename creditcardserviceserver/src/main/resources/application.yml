@@ -22,14 +22,14 @@ spring:
         format_sql: true
         generate_statistics: false
     show-sql: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          #Here, we specified that we'll use JWT tokens for authorization.
-          #
-          #The jwk-set-uri property points to the URI containing the public key so that our Resource Server can verify the tokens' integrity.
-          #
-          #The issuer-uri property represents an additional security measure to validate the issuer of the tokens
-          issuer-uri: http://localhost:8083/auth/realms/baeldung
-          jwk-set-uri: http://localhost:8083/auth/realms/baeldung/protocol/openid-connect/certs
+
+okta:
+  oauth2:
+    issuer: https://dev-15015140.okta.com/oauth2/default
+#    client-id: 0oa5r3zv22LCG8J7i5d6
+#    client-secret: 5WG-Pua6JZ5-npG2S4pGXVqP_PhhMrvreGl6ITCb
+    client-id: 0oa5rd92hv6mViZem5d6
+    client-secret: b9N4M0-WKkpv2Pe4tTeU-VvavBxhxPMgN5SpVCtg
+    scopes: openid
+#    redirect-uri: /authorization-code/callback
+
